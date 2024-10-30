@@ -9,21 +9,22 @@ import cv2
 app = dash.Dash(__name__)
 
 app.layout = html.Div([
-    html.H1("Camouflaged Object Detection"),
+    html.H1("Camouflaged Object Detection", style={'textAlign': 'center', 'color': '#2c3e50', 'marginBottom': '20px'}),
     dcc.Upload(
         id='upload-image',
-        children=html.Div(['Drag and Drop or ', html.A('Select Image')]),
+        children=html.Div(['Drag and Drop or ', html.A('Select Image', style={'color': '#3498db'})]),
         style={
             'width': '100%', 'height': '60px', 'lineHeight': '60px',
-            'borderWidth': '1px', 'borderStyle': 'dashed',
-            'borderRadius': '5px', 'textAlign': 'center', 'margin': '10px'
+            'borderWidth': '2px', 'borderStyle': 'dashed',
+            'borderRadius': '10px', 'textAlign': 'center', 'margin': '20px 0',
+            'backgroundColor': '#ecf0f1', 'color': '#7f8c8d'
         },
         multiple=False
     ),
-    dcc.Graph(id='output-image'),
-])
+    dcc.Graph(id='output-image', style={'border': '1px solid #bdc3c7', 'borderRadius': '10px', 'padding': '10px'}),
+], style={'maxWidth': '800px', 'margin': 'auto', 'padding': '20px', 'fontFamily': 'Arial, sans-serif'})
 
-#Callback for image upload and detection
+# Callback for image upload and detection
 @app.callback(
     Output('output-image', 'figure'),
     [Input('upload-image', 'contents')]

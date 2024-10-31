@@ -1,28 +1,20 @@
-class SAM2Model:
-    """
-    Placeholder for SAM2 model.
-    This class should include the actual loading and inference of the model.
-    """
+import torch
+from sam2.build_sam import build_sam2
+from sam2.sam2_image_predictor import SAM2ImagePredictor
+import numpy as np
 
-    def __init__(self):
-        # Load the pretrained SAM2 model (add actual loading code)
-        pass
+checkpoint = "sam2/checkpoints/sam2.1_hiera_tiny.pt"
+model_cfg = "configs/sam2.1/sam2.1_hiera_t.yaml"
+predictor = SAM2ImagePredictor(build_sam2(model_cfg, checkpoint))
 
-    def segment(self, image):
-        """
-        Perform segmentation on the input image.
-        
-        Args:
-            image: Input image array.
-        
-        Returns:
-            mask: Binary mask of detected camouflaged objects.
-        """
-        # Perform inference using the SAM2 model
-        mask = self.infer(image)
-        return NotImplementedError
-
-    def infer(self, image):
-        """Mock function to simulate model inference."""
-        # This would be replaced with actual model inference logic
-        return NotImplementedError
+with torch.inference_mode(), torch.autocast("cuda", dtype=torch.bfloat16):
+    predictor.set_image("data/test/COD10K-CAM-1-Aquatic-1-BatFish-8.pjg")
+    
+    
+    input_point = np.array([[500, 375]])
+    input_label = np.array([1])
+    masks, _, _ = predictor.predictor.predict(
+                point_coords=input_point,
+                point_labels=input_label,
+                multimask_output=True,
+            )

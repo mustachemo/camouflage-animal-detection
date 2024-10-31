@@ -64,7 +64,14 @@ This project is an AI-powered system designed to detect camouflaged animals in i
 
 3. Download and place the pretrained models in the `models/` directory.
 
-4. Start the Dash web server:
+#### download sam2
+   
+follow the steps from: 
+   ```bash
+   https://github.com/facebookresearch/sam2
+   ```
+
+5. Start the Dash web server:
 
    ```bash
    python app.py

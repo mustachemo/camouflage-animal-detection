@@ -1,5 +1,9 @@
-python-opencv
+opencv-python
 ultralytics
 numpy
 plotly
 dash
+
+pandas
+dash-mantine-components
+dash_iconify

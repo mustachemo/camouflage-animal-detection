@@ -28,9 +28,10 @@ with torch.inference_mode(), torch.autocast("cuda", dtype=torch.bfloat16):
         input_point = np.array([[center_x, center_y]])
         input_label = np.array([0])
         masks, _, _ = predictor.predict(
-                    point_coords=input_point,
+                    # point_coords=input_point,
                     point_labels=input_label,
-                    multimask_output=False,
+                    box=np.array([0,800, 418, 158]),
+                    multimask_output=True,
                 )
 
 

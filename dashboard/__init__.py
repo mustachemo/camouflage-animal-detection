@@ -33,7 +33,11 @@ app.layout = layout
     Input("upload-image", "contents"),
 )
 def output_uploaded_image(content):
-    return dmc.Image(src=content)
+    return dmc.AspectRatio(
+        dmc.Image(src=content),
+        ratio=1,
+        mx="auto",
+    )
 
 
 if __name__ == "__main__":

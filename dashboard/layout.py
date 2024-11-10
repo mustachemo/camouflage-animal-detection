@@ -27,30 +27,40 @@ layout = dmc.MantineProvider(
         },
     },
     children=[
-        dmc.Flex(
-            direction="column",
-            align="left",
-            justify="left",
+        html.Div(
+            style={
+                "display": "flex",
+                "flexDirection": "row",
+                "width": "100%",
+                "margin": "1rem",
+            },
             children=[
-                dcc.Upload(
-                    id="upload-image",
-                    children=dmc.Button(
-                        "Upload Image",
-                        style={
-                            "backgroundColor": "#0C7FDA",
-                            "marginBottom": "20px",
-                        },
-                    ),
-                ),
-                html.Div(
-                    id="output-image-upload",
+                dmc.Flex(
+                    direction="column",
+                    align="left",
+                    justify="left",
+                    children=[
+                        dcc.Upload(
+                            id="upload-image",
+                            children=dmc.Button(
+                                "Upload Image",
+                                style={
+                                    "backgroundColor": "#0C7FDA",
+                                    "marginBottom": "20px",
+                                },
+                            ),
+                        ),
+                        html.Div(
+                            id="output-image-upload",
+                        ),
+                    ],
                     style={
                         "width": "25%",
-                        "height": "25%",
+                        "border": "1px solid #0C7FDA",
                     },
                 ),
+                # Add other content here if needed
             ],
-            style={"margin": "20px"},
         ),
     ],
     forceColorScheme="dark",

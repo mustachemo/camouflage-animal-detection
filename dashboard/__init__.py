@@ -18,10 +18,13 @@ from .layout import layout
 import cv2
 import plotly.express as px
 import numpy as np
-import base64
 import dash_mantine_components as dmc
 
-app = Dash(__name__, suppress_callback_exceptions=True)
+_dash_renderer._set_react_version("18.2.0")
+
+app = Dash(
+    __name__, suppress_callback_exceptions=True, external_stylesheets=dmc.styles.ALL
+)
 app.layout = layout
 
 
@@ -30,7 +33,7 @@ app.layout = layout
     Input("upload-image", "contents"),
 )
 def output_uploaded_image(content):
-    return html.Img(src=content, style={"width": "50%", "height": "50%"})
+    return dmc.Image(src=content)
 
 
 if __name__ == "__main__":

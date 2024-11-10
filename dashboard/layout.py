@@ -5,28 +5,52 @@ from dash_iconify import DashIconify
 
 layout = dmc.MantineProvider(
     id="mantine-provider",
-    children=[
-        dcc.Upload(
-            id="upload-image",
-            children=html.Div(["Drag and Drop or ", html.A("Select Files")]),
-            style={
-                "width": "50%",
-                "height": "60px",
-                "lineHeight": "60px",
-                "borderWidth": "2px",
-                "borderStyle": "dashed",
-                "borderRadius": "10px",
-                "textAlign": "center",
-                "margin": "20px",
-                "backgroundColor": "#f0f0f0",
-                "color": "#333",
-                "fontFamily": "Arial, sans-serif",
-                "fontSize": "16px",
-                "boxShadow": "0 4px 8px rgba(0, 0, 0, 0.1)",
+    theme={
+        "primaryColor": "indigo",
+        "fontFamily": "'Inter', sans-serif",
+        "components": {
+            "Button": {"defaultProps": {"fw": 400}},
+            "Alert": {"styles": {"title": {"fontWeight": 500}}},
+            "AvatarGroup": {"styles": {"truncated": {"fontWeight": 500}}},
+            "Badge": {"styles": {"root": {"fontWeight": 500}}},
+            "Progress": {"styles": {"label": {"fontWeight": 500}}},
+            "RingProgress": {"styles": {"label": {"fontWeight": 500}}},
+            "CodeHighlightTabs": {"styles": {"file": {"padding": 12}}},
+            "Table": {
+                "defaultProps": {
+                    "highlightOnHover": True,
+                    "withTableBorder": True,
+                    "verticalSpacing": "sm",
+                    "horizontalSpacing": "md",
+                }
             },
-        ),
-        html.Div(
-            id="output-image-upload", style={"textAlign": "left", "margin": "20px"}
+        },
+    },
+    children=[
+        dmc.Flex(
+            direction="column",
+            align="left",
+            justify="left",
+            children=[
+                dcc.Upload(
+                    id="upload-image",
+                    children=dmc.Button(
+                        "Upload Image",
+                        style={
+                            "backgroundColor": "#0C7FDA",
+                            "marginBottom": "20px",
+                        },
+                    ),
+                ),
+                html.Div(
+                    id="output-image-upload",
+                    style={
+                        "width": "25%",
+                        "height": "25%",
+                    },
+                ),
+            ],
+            style={"margin": "20px"},
         ),
     ],
     forceColorScheme="dark",

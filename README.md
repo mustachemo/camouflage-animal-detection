@@ -2,6 +2,10 @@
 
 This project is an AI-powered system designed to detect camouflaged animals in images and videos. It integrates object detection using a fine-tuned **Segment Anything Model (SAM2)**, species classification, and video frame analysis. The application is aimed at wildlife researchers, conservationists, and technology enthusiasts interested in advancements in AI and computer vision.
 
+## IMPORT INFORMATION
+- in order for SAM2 to work it needs the config files. Having the config files in sam2/configs/ doesn't work for some reason, I got over this hurdle by having it in the root directory of the project.
+
+
 ## Features
 
 - **Image Detection**: Detect camouflaged animals in still images using advanced segmentation models.

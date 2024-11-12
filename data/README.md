@@ -8,6 +8,9 @@ To build the starter data sets, run the bootstrap shell scripts
 |:---|:---|---|
 |`bootstrap_cod10k.sh`| Downloads the COD10K data set, **Warning**: you need at least 4.5GB to download and unzip, final directory ~2.3GB|https://dengpingfan.github.io/pages/COD.html|
 |`bootstrap_camo.sh`| Downloads the CAMO data set| https://sites.google.com/view/ltnghia/research/camo|
+|`resize_images.py`| Recursivly runs through a directory and resizes the images to supplied arguments (Width Height)|
+
+
 Directories:
 .
 └── COD10K-v3 (unzipped data directory)

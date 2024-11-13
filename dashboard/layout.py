@@ -6,58 +6,16 @@ from dash_iconify import DashIconify
 # Define the AppShell Header
 header = dmc.AppShellHeader(
     children=[
-        dmc.Container(
-            fluid=True,
-            children=[
-                dmc.Group(
-                    align="center",
-                    children=[
-                        dmc.Text(
-                            children="App Title",
-                            id="app-title",
-                            size="lg",  # Font size set to large
-                            inherit=False,  # Does not inherit font properties from parent
-                            inline=True,  # Sets line-height to 1 for centered alignment
-                            truncate={
-                                "side": "end"
-                            },  # Truncates long text from the end
-                        ),
-                        dmc.Group(
-                            children=[
-                                dmc.Anchor(
-                                    href="/home",
-                                    children=[
-                                        DashIconify(icon="tabler:home", width=24),
-                                        dmc.Text("Home", size="sm"),
-                                    ],
-                                ),
-                                dmc.Anchor(
-                                    href="/about",
-                                    children=[
-                                        DashIconify(
-                                            icon="tabler:info-circle", width=24
-                                        ),
-                                        dmc.Text("About", size="sm"),
-                                    ],
-                                ),
-                                dmc.Anchor(
-                                    href="/gallery",
-                                    children=[
-                                        DashIconify(icon="tabler:photo", width=24),
-                                        dmc.Text("Gallery", size="sm"),
-                                    ],
-                                ),
-                                dmc.Button(
-                                    "Profile",
-                                    variant="outline",
-                                    color="indigo",
-                                    id="profile-button",
-                                ),
-                            ],
-                        ),
-                    ],
-                ),
-            ],
+        dmc.Center(
+            dmc.Text(
+                "Team 69 - Camouflage Animal Detection",
+                size="xl",
+                style={"color": "#FFFFFF"},
+            ),
+            style={
+                "width": "100%",
+                "height": "100%",
+            },
         )
     ],
     withBorder=True,
@@ -104,14 +62,12 @@ layout = dmc.MantineProvider(
                                 "display": "flex",
                                 "flexDirection": "row",
                                 "width": "100%",
-                                # "margin": "1rem",
-                                "border": "1px solid #0f0f0f",
                             },
                             children=[
                                 dmc.Flex(
                                     direction="column",
-                                    align="left",
-                                    justify="left",
+                                    align="center",
+                                    justify="center",
                                     children=[
                                         dmc.Center(
                                             children=[
@@ -121,20 +77,24 @@ layout = dmc.MantineProvider(
                                                         "Upload Image",
                                                         style={
                                                             "backgroundColor": "#0C7FDA",
-                                                            "marginBottom": "20px",
                                                             "width": "100%",
                                                         },
                                                     ),
                                                 )
-                                            ]
+                                            ],
+                                            style={"padding": "1rem"},
                                         ),
                                         html.Div(
                                             id="output-image-upload",
+                                            style={
+                                                "border": "1px solid #0C7FDA",
+                                                "width": "512px",
+                                                "height": "512px",
+                                            },
                                         ),
                                     ],
                                     style={
                                         "width": "100%",
-                                        "border": "1px solid #0C7FDA",
                                     },
                                 ),
                                 # Add other content here if needed

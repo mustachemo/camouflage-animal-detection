@@ -21,11 +21,11 @@ def clip_object(original_image, mask):
 
     return rgba_image
 
-##Test Code:
-# original_image = cv2.imread("data/CAMO-V.1.0-CVIU2019/Images/Test/camourflage_01244.jpg")
-# mask = cv2.imread("data/CAMO-V.1.0-CVIU2019/GT/camourflage_01244.png", cv2.IMREAD_GRAYSCALE)
+#Test Code:
+original_image = cv2.imread("data/CAMO-V.1.0-CVIU2019/Images/Train/camourflage_00298.jpg")
+mask = cv2.imread("data/CAMO-V.1.0-CVIU2019/GT/camourflage_00298.png", cv2.IMREAD_GRAYSCALE)
 
-# mask = clip_object(original_image, mask)
+mask = clip_object(original_image, mask)
 
-# cv2.imwrite("clipped_object.png", mask)
+cv2.imwrite("clipped_object.png", mask)
 

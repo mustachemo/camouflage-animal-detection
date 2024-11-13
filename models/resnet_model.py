@@ -1,14 +1,11 @@
-# Imports
+#Used to create a fine tuned model for the Mask Dataset
 from torchvision import datasets, transforms, models
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader
 from PIL import Image
 import os
-import pandas as pd
-from sklearn.metrics import precision_score, recall_score, f1_score
-from torchmetrics.classification import MulticlassAccuracy
 
 # Set device (CPU or GPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -29,16 +26,8 @@ if not os.path.isdir(data_dir):
     print(f"Dataset directory '{data_dir}' not found.")
 else:
     dataset = datasets.ImageFolder(data_dir, transform=transform)
+    train_loader = DataLoader(dataset, batch_size=32, shuffle=True)
     print(f"Dataset loaded with {len(dataset)} samples and {len(dataset.classes)} classes.")
-
-    # Split dataset into training and validation sets
-    dataset_size = len(dataset)
-    train_size = int(0.8 * dataset_size)
-    val_size = dataset_size - train_size
-    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
-
-    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
     # Load pretrained model
     print("Loading pretrained model...")
@@ -62,32 +51,14 @@ else:
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=5e-5)  # Reduce learning rate
 
-    # Initialize metric calculators
-    accuracy_calculator = MulticlassAccuracy(num_classes=num_classes).to(device)
-
-    # Dictionary to store metrics
-    metrics = {
-        'epoch': [],
-        'train_loss': [],
-        'val_loss': [],
-        'train_accuracy': [],
-        'val_accuracy': [],
-        'precision': [],
-        'recall': [],
-        'f1_score': []
-    }
-
-    # Training and validation loop
+    # Training loop with debugging output
     num_epochs = 20
-    print("Starting training and validation loop...")
-
+    print("Starting training loop...")
+    model.train()
     for epoch in range(num_epochs):
-        # Training phase
         running_loss = 0.0
-        running_accuracy = 0.0
-        model.train()
         for i, (images, labels) in enumerate(train_loader):
-            images, labels = images.to(device), labels.to(device)
+            images, labels = images.to(device), labels.to(device)  # Move data to device
 
             # Zero gradients, forward pass, compute loss, backprop, optimize
             optimizer.zero_grad()
@@ -96,64 +67,12 @@ else:
             loss.backward()
             optimizer.step()
 
-            # Track loss and accuracy
+            # Accumulate loss for display
             running_loss += loss.item()
-            running_accuracy += accuracy_calculator(outputs, labels).item()
+            if i % 10 == 9:  # Print every 10 mini-batches
+                print(f"Epoch [{epoch+1}/{num_epochs}], Batch [{i+1}/{len(train_loader)}], Loss: {running_loss / 10:.4f}")
+                running_loss = 0.0
 
-        # Calculate and log training metrics for this epoch
-        avg_train_loss = running_loss / len(train_loader)
-        avg_train_accuracy = running_accuracy / len(train_loader)
-
-        # Validation phase
-        model.eval()
-        val_loss = 0.0
-        val_accuracy = 0.0
-        all_labels = []
-        all_preds = []
-        with torch.no_grad():
-            for images, labels in val_loader:
-                images, labels = images.to(device), labels.to(device)
-                outputs = model(images)
-                loss = criterion(outputs, labels)
-
-                # Track validation loss and accuracy
-                val_loss += loss.item()
-                val_accuracy += accuracy_calculator(outputs, labels).item()
-
-                # Store labels and predictions for precision, recall, and F1 calculation
-                _, preds = torch.max(outputs, 1)
-                all_labels.extend(labels.cpu().numpy())
-                all_preds.extend(preds.cpu().numpy())
-
-        # Calculate and log validation metrics for this epoch
-        avg_val_loss = val_loss / len(val_loader)
-        avg_val_accuracy = val_accuracy / len(val_loader)
-        precision = precision_score(all_labels, all_preds, average='weighted')
-        recall = recall_score(all_labels, all_preds, average='weighted')
-        f1 = f1_score(all_labels, all_preds, average='weighted')
-
-        # Save metrics
-        metrics['epoch'].append(epoch + 1)
-        metrics['train_loss'].append(avg_train_loss)
-        metrics['val_loss'].append(avg_val_loss)
-        metrics['train_accuracy'].append(avg_train_accuracy)
-        metrics['val_accuracy'].append(avg_val_accuracy)
-        metrics['precision'].append(precision)
-        metrics['recall'].append(recall)
-        metrics['f1_score'].append(f1)
-
-        print(f"Epoch [{epoch+1}/{num_epochs}], "
-              f"Train Loss: {avg_train_loss:.4f}, Val Loss: {avg_val_loss:.4f}, "
-              f"Train Accuracy: {avg_train_accuracy:.4f}, Val Accuracy: {avg_val_accuracy:.4f}, "
-              f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1 Score: {f1:.4f}")
-
-    print("Training and validation complete.")
+    print("Training complete.")
     torch.save(model.state_dict(), "fine_tuned_model.pth")
     print("Model saved as 'fine_tuned_model.pth'.")
-
-    # Save metrics to file
-    metrics_df = pd.DataFrame(metrics)
-    metrics_df.to_csv("training_validation_metrics.csv", index=False)
-    print("Metrics saved as 'training_validation_metrics.csv'.")
-
-

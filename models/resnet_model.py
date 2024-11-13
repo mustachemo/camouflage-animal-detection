@@ -1,11 +1,11 @@
-#Used to create a fine tuned model for the Mask Dataset
+# Used to create a fine-tuned model for the Mask Dataset
 from torchvision import datasets, transforms, models
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from PIL import Image
 import os
+import json
 
 # Set device (CPU or GPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -49,14 +49,24 @@ else:
 
     # Loss and optimizer with a modified learning rate
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=5e-5)  # Reduce learning rate
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=5e-5)  # Reduced learning rate
 
-    # Training loop with debugging output
+    # Metrics storage
+    metrics = {
+        "epoch": [],
+        "loss": [],
+        "accuracy": []
+    }
+
+    # Training loop
     num_epochs = 20
     print("Starting training loop...")
     model.train()
     for epoch in range(num_epochs):
         running_loss = 0.0
+        correct = 0
+        total = 0
+
         for i, (images, labels) in enumerate(train_loader):
             images, labels = images.to(device), labels.to(device)  # Move data to device
 
@@ -67,12 +77,28 @@ else:
             loss.backward()
             optimizer.step()
 
-            # Accumulate loss for display
+            # Accumulate loss and calculate accuracy
             running_loss += loss.item()
-            if i % 10 == 9:  # Print every 10 mini-batches
-                print(f"Epoch [{epoch+1}/{num_epochs}], Batch [{i+1}/{len(train_loader)}], Loss: {running_loss / 10:.4f}")
-                running_loss = 0.0
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+        # Calculate and store epoch metrics
+        epoch_loss = running_loss / len(train_loader)
+        epoch_accuracy = 100 * correct / total
+        metrics["epoch"].append(epoch + 1)
+        metrics["loss"].append(epoch_loss)
+        metrics["accuracy"].append(epoch_accuracy)
+
+        print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.2f}%")
 
     print("Training complete.")
+
+    # Save the model
     torch.save(model.state_dict(), "fine_tuned_model.pth")
     print("Model saved as 'fine_tuned_model.pth'.")
+
+    # Save metrics to JSON
+    with open("training_metrics.json", "w") as f:
+        json.dump(metrics, f, indent=4)
+    print("Metrics saved as 'training_metrics.json'.")

@@ -113,16 +113,20 @@ layout = dmc.MantineProvider(
                                     align="left",
                                     justify="left",
                                     children=[
-                                        dcc.Upload(
-                                            id="upload-image",
-                                            children=dmc.Button(
-                                                "Upload Image",
-                                                style={
-                                                    "backgroundColor": "#0C7FDA",
-                                                    "marginBottom": "20px",
-                                                    "width": "100%",
-                                                },
-                                            ),
+                                        dmc.Center(
+                                            children=[
+                                                dcc.Upload(
+                                                    id="upload-image",
+                                                    children=dmc.Button(
+                                                        "Upload Image",
+                                                        style={
+                                                            "backgroundColor": "#0C7FDA",
+                                                            "marginBottom": "20px",
+                                                            "width": "100%",
+                                                        },
+                                                    ),
+                                                )
+                                            ]
                                         ),
                                         html.Div(
                                             id="output-image-upload",

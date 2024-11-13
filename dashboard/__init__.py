@@ -35,7 +35,6 @@ app.layout = layout
 def output_uploaded_image(content):
     return dmc.AspectRatio(
         dmc.Image(src=content),
-        ratio=1,
         mx="auto",
     )
 

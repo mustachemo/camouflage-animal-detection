@@ -31,7 +31,7 @@ layout = dmc.MantineProvider(
             style={
                 "display": "flex",
                 "flexDirection": "row",
-                "width": "100%",
+                "width": "25%",
                 "margin": "1rem",
             },
             children=[
@@ -55,7 +55,7 @@ layout = dmc.MantineProvider(
                         ),
                     ],
                     style={
-                        "width": "25%",
+                        "width": "100%",
                         "border": "1px solid #0C7FDA",
                     },
                 ),

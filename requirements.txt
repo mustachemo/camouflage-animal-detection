@@ -7,3 +7,4 @@ dash
 pandas
 dash-mantine-components
 dash_iconify
+scikit-learn

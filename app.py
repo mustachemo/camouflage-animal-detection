@@ -8,7 +8,7 @@ from utils.video_processing import extract_frames
 import cv2
 from dotenv import load_dotenv
 import os
-
+import requests
 
 load_dotenv()
 app = dash.Dash(__name__)
@@ -28,43 +28,45 @@ app.layout = html.Div([
         multiple=False
     ),
     dcc.Graph(id='output-image', style={'border': '1px solid #bdc3c7', 'borderRadius': '10px', 'padding': '10px'}),
-    dcc.Graph(id='map', style={'border': '1px solid #bdc3c7', 'borderRadius': '10px', 'padding': '10px', 'marginTop': '20px'}),
+    html.Div(id='map-label', style={'textAlign': 'center', 'marginTop': '20px', 'fontSize': '20px', 'color': '#2c3e50'}),
+    dcc.Graph(id='map', style={'border': '1px solid #bdc3c7', 'borderRadius': '10px', 'padding': '10px', 'marginTop': '10px'}),
 ], style={'maxWidth': '800px', 'margin': 'auto', 'padding': '20px', 'fontFamily': 'Arial, sans-serif'})
 
-def create_map_figure(center_coords, border_coords):
+def fetch_gbif_data(query):
+    url = f"https://api.gbif.org/v1/occurrence/search?q={query}&limit=1000"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        occurrences = data.get('results', [])
+        latitudes = [occ['decimalLatitude'] for occ in occurrences if 'decimalLatitude' in occ]
+        longitudes = [occ['decimalLongitude'] for occ in occurrences if 'decimalLongitude' in occ]
+        return latitudes, longitudes
+    else:
+        return [], []
+
+def create_map_figure(latitudes, longitudes):
     fig = go.Figure(go.Scattermapbox(
-        lat=[center_coords["lat"]],
-        lon=[center_coords["lon"]],
+        lat=latitudes,
+        lon=longitudes,
         mode='markers',
-        marker=go.scattermapbox.Marker(size=14),
-        text=["Location"]
+        marker=go.scattermapbox.Marker(size=9),
+        text=["Occurrence"] * len(latitudes)
     ))
     
     fig.update_layout(
         mapbox={
             'accesstoken': mapbox_access_token,
             'style': "open-street-map",
-            'center': center_coords,
-            'zoom': 10,
-            'layers': [{
-                'source': {
-                    'type': "FeatureCollection",
-                    'features': [{
-                        'type': "Feature",
-                        'geometry': {
-                            'type': "Polygon",
-                            'coordinates': [border_coords]
-                        }
-                    }]
-                },
-                'type': "line",
-                'color': "blue"
-            }]
+            'center': {"lat": 0, "lon": 0},
+            'zoom': 1
         },
         margin={"r":0,"t":0,"l":0,"b":0}
     )
     
     return fig
+
+# Set default data as "frog"
+default_latitudes, default_longitudes = fetch_gbif_data("frog")
 
 # Callback for image upload and detection
 @app.callback(
@@ -78,22 +80,22 @@ def update_output(contents):
         return fig
     return {}
 
-# Callback to update the map
+# Callback to update the map and label
 @app.callback(
-    Output('map', 'figure'),
+    [Output('map', 'figure'), Output('map-label', 'children')],
     [Input('upload-image', 'contents')]
 )
 def update_map(contents):
-    center_coords = {"lat": 33.7490, "lon": -84.3880}
-    border_coords = [
-        [-84.5517, 33.6475],
-        [-84.5517, 33.8500],
-        [-84.2249, 33.8500],
-        [-84.2249, 33.6475],
-        [-84.5517, 33.6475]
-    ]
+    if contents is not None:
+        classification = "frog"  # Replace with actual classification logic (split the classification label at the "-" and take the second part)
+        
+        latitudes, longitudes = fetch_gbif_data(classification)
+        label = f"Showing the last {len(latitudes)} occurrences of {classification}"
+        return create_map_figure(latitudes, longitudes), label
     
-    return create_map_figure(center_coords, border_coords)
+    # Default data for "frog"
+    label = f"Showing the last {len(default_latitudes)} occurrences of frog"
+    return create_map_figure(default_latitudes, default_longitudes), label
 
 if __name__ == '__main__':
     app.run_server(debug=True)

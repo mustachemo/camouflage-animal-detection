@@ -25,6 +25,7 @@ import numpy as np
 import dash_mantine_components as dmc
 from models.seg_model import initialize_seg_model, get_mask
 from utils.classification import predict_clipped_object  # Import predict_clipped_object
+import re
 
 _dash_renderer._set_react_version("18.2.0")
 
@@ -35,6 +36,10 @@ app.layout = layout
 
 # Initialize segmentation model
 birefnet, device, transform_image = initialize_seg_model()
+
+# Helper function to sanitize filename
+def sanitize_filename(filename):
+    return re.sub(r'[^a-zA-Z0-9_.-]', '_', filename)
 
 @callback(
     Output("output-original-image", "children"),
@@ -56,6 +61,13 @@ def output_original_image(content):
 )
 def output_clipped_image_and_prediction(content, filename):
     if content is not None:
+        # Ensure the temp directory exists
+        if not os.path.exists("temp"):
+            os.makedirs("temp")
+        
+        # Sanitize the filename
+        filename = sanitize_filename(filename)
+
         # Decode the uploaded image and save it temporarily
         content_type, content_string = content.split(',')
         decoded = base64.b64decode(content_string)

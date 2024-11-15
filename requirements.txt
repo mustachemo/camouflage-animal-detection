@@ -3,6 +3,7 @@ ultralytics
 numpy
 plotly
 dash
+transformers
 
 pandas
 dash-mantine-components

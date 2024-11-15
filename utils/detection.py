@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import base64
-from models.sam2_model import SAM2Model
+from models.seg_model import SAM2Model
 
 def detect_camouflaged_animals(image_data):
     """

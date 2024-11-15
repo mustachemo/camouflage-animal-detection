@@ -1,6 +1,13 @@
-python-opencv
-ultralytics
+opencv-python
 numpy
 plotly
 dash
+transformers
 pillow
+kornia
+timm
+
+pandas
+dash-mantine-components
+dash_iconify
+scikit-learn

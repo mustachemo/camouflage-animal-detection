@@ -1,24 +1,30 @@
 import os
 from torch.utils.data import Dataset
 from PIL import Image
-from torchvision.transforms import Compose, ToTensor, Resize, Normalize
+from torchvision.transforms import Compose, Resize, Normalize, ToTensor
 
 
 class ImageMaskDataset(Dataset):
-    def __init__(self, image_dir, mask_dir, transform=None, target_transform=None):
+    def __init__(self, image_dir, mask_dir, image_size=(512, 512)):
         """
         Args:
             image_dir (str): Directory containing images.
             mask_dir (str): Directory containing masks.
-            transform (callable, optional): Transform to apply to images.
-            target_transform (callable, optional): Transform to apply to masks.
+            image_size (tuple): Desired size of images and masks (width, height).
         """
         self.image_dir = image_dir
         self.mask_dir = mask_dir
         self.image_filenames = sorted(os.listdir(image_dir))
         self.mask_filenames = sorted(os.listdir(mask_dir))
-        self.transform = transform
-        self.target_transform = target_transform
+        self.image_transform = Compose([
+            Resize(image_size),
+            ToTensor(),
+            Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
+        self.mask_transform = Compose([
+            Resize(image_size),
+            ToTensor(),
+        ])
 
     def __len__(self):
         return len(self.image_filenames)
@@ -32,9 +38,7 @@ class ImageMaskDataset(Dataset):
         mask = Image.open(mask_path).convert("L")  # Assuming masks are grayscale
 
         # Apply transforms
-        if self.transform:
-            image = self.transform(image)
-        if self.target_transform:
-            mask = self.target_transform(mask)
+        image = self.image_transform(image)
+        mask = self.mask_transform(mask)
 
         return {"image": image, "mask": mask}

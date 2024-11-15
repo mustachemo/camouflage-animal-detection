@@ -2,49 +2,24 @@ from transformers import AutoModelForImageSegmentation, AutoProcessor
 from torch.utils.data import DataLoader
 from torchvision.transforms import Compose, Resize, Normalize, ToTensor
 import torch
+from data_loader import ImageMaskDataset
 
 # Load the pre-trained model
 birefnet = AutoModelForImageSegmentation.from_pretrained(
     "zhengpeng7/BiRefNet-COD", trust_remote_code=True
 )
 
-# Load the processor (for preprocessing images)
-processor = AutoProcessor.from_pretrained("zhengpeng7/BiRefNet-COD")
-
-
-# Define preprocessing
-def preprocess_image(image, size=512):
-    transforms = Compose([
-        Resize((size, size)),
-        ToTensor(),
-        Normalize(mean=processor.image_mean, std=processor.image_std),
-    ])
-    return transforms(image)
-
-
 # Load your dataset (e.g., COD10k)
 # Replace with your dataset loading mechanism
-from datasets import load_dataset
+train_dataset = ImageMaskDataset(
+    image_dir="./data/train/images",
+    mask_dir="./data/train/masks",
+    image_size=(512, 512),  # Resize all images and masks to 512x512
+)
 
-dataset = load_dataset("path_to_cod10k")
-
-
-# Preprocess dataset
-def preprocess_data(example):
-    image = example["image"]  # Adjust key to your dataset
-    mask = example["mask"]  # Adjust key to your dataset
-    image = preprocess_image(image)
-    mask = preprocess_image(mask)  # Ensure mask has the same transformations
-    return {"image": image, "mask": mask}
-
-
-# Apply preprocessing
-train_dataset = dataset["train"].map(preprocess_data)
-val_dataset = dataset["validation"].map(preprocess_data)
 
 # Create DataLoader
-train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
-val_loader = DataLoader(val_dataset, batch_size=8)
+train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
 
 
 from torch.optim import AdamW
@@ -74,7 +49,7 @@ for epoch in range(epochs):
         masks = batch["mask"].to(device)
 
         # Forward pass
-        outputs = birefnet(pixel_values=images)
+        outputs = birefnet(images)
         loss = criterion(outputs.logits, masks)
 
         # Backward pass
@@ -98,20 +73,7 @@ for epoch in range(epochs):
     print(f"Validation Loss: {val_loss / len(val_loader)}")
 
 
-birefnet.save_pretrained("birefnet-cod10k-finetuned")
-processor.save_pretrained("birefnet-cod10k-finetuned")
-
-
-# Load test image
-from PIL import Image
-
-test_image = Image.open("path_to_test_image").convert("RGB")
-test_image_preprocessed = preprocess_image(test_image).unsqueeze(0).to(device)
-
-# Predict
-birefnet.eval()
-with torch.no_grad():
-    outputs = birefnet(pixel_values=test_image_preprocessed)
-
-# Post-process and visualize results
-pred_mask = outputs.logits.argmax(dim=1).squeeze().cpu().numpy()
+try:
+    birefnet.save_pretrained("birefnet-cod10k-finetuned")
+except FileNotFoundError:
+    print("Model not saved. Please check the path.")

@@ -113,6 +113,17 @@ layout = dmc.MantineProvider(
                                                     ],),
                                             ],
                                         ),
+                                        html.Div(
+                                            id="output-predicted-label",
+                                            style={
+                                                "textAlign": "center",
+                                                "color": "#0C7FDA",
+                                                "fontSize": "20px",
+                                                "fontWeight": "bold",
+                                                "margin": "0 20px",
+                                                "alignSelf": "center",
+                                            },
+                                        ),
                                     ],
                                     style={
                                         "width": "100%",

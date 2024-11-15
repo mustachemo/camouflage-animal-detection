@@ -29,10 +29,22 @@ model.eval()
 
 # Function to clip object from original image using the mask
 def clip_object(original_image, mask):
+    # Resize mask to match the size of the original image if necessary
+    if mask.shape[:2] != original_image.shape[:2]:
+        mask = cv2.resize(mask, (original_image.shape[1], original_image.shape[0]), interpolation=cv2.INTER_NEAREST)
+
+    # Ensure mask is a single channel grayscale image
+    if len(mask.shape) == 3:
+        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+
+    # Apply the mask
     masked_image = cv2.bitwise_and(original_image, original_image, mask=mask)
+
+    # Create an alpha channel using the mask
     b, g, r = cv2.split(masked_image)
     alpha_channel = mask
     rgba_image = cv2.merge((b, g, r, alpha_channel))
+
     return rgba_image
 
 # Function to make predictions on the clipped object

@@ -1,4 +1,5 @@
-FROM python:3.8-slim
+# FROM python:3.8-slim
+FROM nvidia/cuda:12.6.2-cudnn-devel-ubuntu22.04
 
 WORKDIR /app
 
@@ -8,6 +9,13 @@ RUN pip install --upgrade pip
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 8050
+RUN apt-get update && \
+    apt-get install \
+    python3 \
+    python3-pip \
+    git \
+    -y
 
-CMD ["python", "app.py"]
+RUN apt-get update && apt-get install -y libgl1-mesa-glx
+
+RUN pip install --no-cache-dir -r requirements.txt

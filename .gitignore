@@ -1,5 +1,9 @@
 # MacOS extra file stuff
 .DS_Store
+checkpoints/
+sam2/
+data/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,6 +1,7 @@
 data/train
 data/test
 clipped_object.png
+temp/
 # MacOS extra file stuff
 .DS_Store
 

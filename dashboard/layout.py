@@ -89,22 +89,28 @@ layout = dmc.MantineProvider(
                                             align="center",
                                             justify="center",
                                             children=[
-                                                html.Div(
-                                                    id="output-original-image",
-                                                    style={
-                                                        "border": "1px solid #0C7FDA",
-                                                        "width": "512px",
-                                                        "height": "512px",
-                                                    },
-                                                ),
-                                                html.Div(
-                                                    id="output-mask-image",
-                                                    style={
-                                                        "border": "1px solid #0C7FDA",
-                                                        "width": "512px",
-                                                        "height": "512px",
-                                                    },
-                                                ),
+                                                dmc.Loader(
+                                                    children=[
+                                                        html.Div(
+                                                            id="output-original-image",
+                                                            style={
+                                                                "border": "1px solid #0C7FDA",
+                                                                "width": "512px",
+                                                                "height": "512px",
+                                                            },
+                                                        ),
+                                                    ],),
+                                                dmc.Loader(
+                                                    children=[
+                                                        html.Div(
+                                                            id="output-mask-image",
+                                                            style={
+                                                                "border": "1px solid #0C7FDA",
+                                                                "width": "512px",
+                                                                "height": "512px",
+                                                            },
+                                                        ),
+                                                    ],),
                                             ],
                                         ),
                                     ],
@@ -112,7 +118,6 @@ layout = dmc.MantineProvider(
                                         "width": "100%",
                                     },
                                 ),
-                                # Add other content here if needed
                             ],
                         ),
                     ]

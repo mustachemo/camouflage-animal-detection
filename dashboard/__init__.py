@@ -33,6 +33,7 @@ app = Dash(
 )
 app.layout = layout
 
+birefnet, device, transform_image = initialize_seg_model()
 
 
 @callback(
@@ -43,7 +44,7 @@ def output_original_image(content):
     if content is not None:
         return dmc.AspectRatio(
             dmc.Image(src=content),
-            ratio=512 / 512,
+            ratio=1024 / 1024,
             mx="auto",
         )
 
@@ -53,14 +54,14 @@ def output_original_image(content):
 )
 def output_mask_image(content):
     if content is not None:
-        # Decode the base64 image data
+        # decode the base64 image data
         content_type, content_string = content.split(',')
         decoded = base64.b64decode(content_string)
         image = Image.open(BytesIO(decoded))
 
-        mask = get_mask(image)
-
-        # Convert the mask to base64
+        mask = get_mask(image, birefnet, device, transform_image)
+        
+        # encode the mask to base64
         buffered = BytesIO()
         mask.save(buffered, format="JPEG")
         mask_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
@@ -75,5 +76,5 @@ def output_mask_image(content):
 
 
 if __name__ == "__main__":
-    initialize_seg_model()
+    # initialize_seg_model()
     app.run(debug=True)

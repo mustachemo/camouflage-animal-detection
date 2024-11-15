@@ -82,9 +82,12 @@ layout = dmc.MantineProvider(
                                                     ),
                                                 )
                                             ],
+                                            
                                             style={"padding": "1rem"},
                                         ),
-                                        dmc.Flex(
+                                        html.Div(id="output-classification", style={"marginTop": "1rem"}),
+
+                                         dmc.Flex(
                                             direction="row",
                                             align="center",
                                             justify="center",

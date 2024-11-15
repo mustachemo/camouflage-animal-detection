@@ -36,17 +36,19 @@ def clip_object(original_image, mask):
     return rgba_image
 
 # Function to make predictions on the clipped object
-def predict_clipped_object(original_image_path, mask_path):
+def predict_clipped_object(original_image_path, mask_path = None):
     # Load images
     original_image = cv2.imread(original_image_path)
-    mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+    if mask_path:
+        mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        # Clip object and save the result temporarily
+        clipped_image = clip_object(original_image, mask)
+        clipped_image_path = "clipped_object.png"
+        cv2.imwrite(clipped_image_path, clipped_image)
+
+    else: 
+        clipped_image_path = original_image_path
     
-    # Clip object and save the result temporarily
-    clipped_image = clip_object(original_image, mask)
-    clipped_image_path = "clipped_object.png"
-    cv2.imwrite(clipped_image_path, clipped_image)
-    
-    # Load clipped image for prediction
     image = Image.open(clipped_image_path).convert("RGB")
     image = transform(image).unsqueeze(0)
     
@@ -59,9 +61,16 @@ def predict_clipped_object(original_image_path, mask_path):
     return predicted_index.item(), labels[predicted_index.item()]
 
 # Example usage
-original_image_path = "data/CAMO-V.1.0-CVIU2019/Images/Test/camourflage_00463.jpg"
-mask_path = "data/CAMO-V.1.0-CVIU2019/GT/camourflage_00463.png"
-predicted_index, predicted_label = predict_clipped_object(original_image_path, mask_path)
+# original_image_path = "frames_output/frame_0010.jpg"
+# mask_path = "frames_output/frame_0010.jpg"
 
-print(f"Predicted index: {predicted_index}")
-print(f"Predicted label: {predicted_label}")
+# # Without mask 
+# predicted_index, predicted_label = predict_clipped_object(original_image_path)
+
+# print(f"1.) Predicted index: {predicted_index}")
+# print(f"Predicted label: {predicted_label}")
+# # With mask
+# predicted_index, predicted_label = predict_clipped_object(original_image_path, mask_path)
+
+# print(f"2.)Predicted index: {predicted_index}")
+# print(f"Predicted label: {predicted_label}")

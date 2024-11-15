@@ -23,7 +23,7 @@ import cv2
 import plotly.express as px
 import numpy as np
 import dash_mantine_components as dmc
-from models.seg_model import initialize_seg_model, get_mask
+from segmentation.seg_model import initialize_seg_model, get_mask
 
 _dash_renderer._set_react_version("18.2.0")
 
@@ -48,6 +48,7 @@ def output_original_image(content):
             mx="auto",
         )
 
+
 @callback(
     Output("output-mask-image", "children"),
     Input("upload-image", "contents"),
@@ -55,16 +56,16 @@ def output_original_image(content):
 def output_mask_image(content):
     if content is not None:
         # decode the base64 image data
-        content_type, content_string = content.split(',')
+        content_type, content_string = content.split(",")
         decoded = base64.b64decode(content_string)
         image = Image.open(BytesIO(decoded))
 
         mask = get_mask(image, birefnet, device, transform_image)
-        
+
         # encode the mask to base64
         buffered = BytesIO()
         mask.save(buffered, format="JPEG")
-        mask_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        mask_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
         mask_data = f"data:image/jpeg;base64,{mask_base64}"
 
         return dmc.AspectRatio(
@@ -72,7 +73,6 @@ def output_mask_image(content):
             ratio=1024 / 1024,
             mx="auto",
         )
-
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 data/train
 data/test
-
+data
 # MacOS extra file stuff
 .DS_Store
 

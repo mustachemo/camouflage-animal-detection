@@ -28,10 +28,22 @@ def initialize_seg_model():
     ])
 
 
-def get_mask(image_path):
-    global birefnet, device, transform_image
+def get_mask(image):
+    birefnet = AutoModelForImageSegmentation.from_pretrained(
+        "zhengpeng7/BiRefNet-COD", trust_remote_code=True
+    )
 
-    image = Image.open(image_path).convert("RGB")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    torch.set_float32_matmul_precision("high")
+
+    birefnet.to(device)
+    birefnet.eval()
+
+    transform_image = transforms.Compose([
+        transforms.Resize((1024, 1024)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ])
     input_images = transform_image(image).unsqueeze(0).to(device)
 
     with torch.no_grad():

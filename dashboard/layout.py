@@ -84,13 +84,28 @@ layout = dmc.MantineProvider(
                                             ],
                                             style={"padding": "1rem"},
                                         ),
-                                        html.Div(
-                                            id="output-image-upload",
-                                            style={
-                                                "border": "1px solid #0C7FDA",
-                                                "width": "512px",
-                                                "height": "512px",
-                                            },
+                                        dmc.Flex(
+                                            direction="row",
+                                            align="center",
+                                            justify="center",
+                                            children=[
+                                                html.Div(
+                                                    id="output-original-image",
+                                                    style={
+                                                        "border": "1px solid #0C7FDA",
+                                                        "width": "512px",
+                                                        "height": "512px",
+                                                    },
+                                                ),
+                                                html.Div(
+                                                    id="output-mask-image",
+                                                    style={
+                                                        "border": "1px solid #0C7FDA",
+                                                        "width": "512px",
+                                                        "height": "512px",
+                                                    },
+                                                ),
+                                            ],
                                         ),
                                     ],
                                     style={

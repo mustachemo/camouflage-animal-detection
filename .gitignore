@@ -1,3 +1,5 @@
+# MacOS extra file stuff
+.DS_Store
 checkpoints/
 sam2/
 data/

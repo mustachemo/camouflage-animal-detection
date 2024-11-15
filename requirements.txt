@@ -1,4 +1,6 @@
 opencv-python
+ultralytics
 numpy
 plotly
 dash
+python-dotenv

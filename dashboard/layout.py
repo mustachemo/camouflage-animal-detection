@@ -99,7 +99,8 @@ layout = dmc.MantineProvider(
                                                                 "height": "512px",
                                                             },
                                                         ),
-                                                    ],),
+                                                    ],
+                                                ),
                                                 dmc.Loader(
                                                     children=[
                                                         html.Div(
@@ -110,7 +111,8 @@ layout = dmc.MantineProvider(
                                                                 "height": "512px",
                                                             },
                                                         ),
-                                                    ],),
+                                                    ],
+                                                ),
                                             ],
                                         ),
                                         html.Div(
@@ -122,6 +124,16 @@ layout = dmc.MantineProvider(
                                                 "fontWeight": "bold",
                                                 "margin": "0 20px",
                                                 "alignSelf": "center",
+                                            },
+                                        ),
+                                        html.Div(
+                                            id="animal-info",
+                                            style={
+                                                "marginTop": "20px",
+                                                "padding": "10px",
+                                                "border": "1px solid #ccc",
+                                                "borderRadius": "5px",
+                                                "backgroundColor": "#f9f9f9",
                                             },
                                         ),
                                     ],

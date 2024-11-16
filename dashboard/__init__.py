@@ -26,6 +26,7 @@ import dash_mantine_components as dmc
 from models.seg_model import initialize_seg_model, get_mask
 from utils.classification import predict_clipped_object  # Import predict_clipped_object
 import re
+import requests
 
 _dash_renderer._set_react_version("18.2.0")
 
@@ -36,6 +37,38 @@ app.layout = layout
 
 # Initialize segmentation model
 birefnet, device, transform_image = initialize_seg_model()
+
+
+def get_animal_info(animal_name):
+    url = f"https://en.wikipedia.org/w/api.php?action=query&format=json&titles={animal_name.replace(' ', '_')}&prop=extracts|pageprops&explaintext&redirects=1"
+    response = requests.get(url)
+    data = response.json()
+
+    pages = data["query"]["pages"]
+    page = next(iter(pages.values()))
+
+    if "extract" in page:
+        return format_info(page["title"], page["extract"])
+    else:
+        return f"No information found for {animal_name}."
+
+
+def format_info(title, extract):
+    # Extract relevant information
+    origin = re.search(r"origin.*?(\.|$)", extract, re.IGNORECASE)
+    behavior = re.search(r"behavior.*?(\.|$)", extract, re.IGNORECASE)
+    size = re.search(r"size.*?(\.|$)", extract, re.IGNORECASE)
+    fun_fact = "Did you know? " + extract.split(".")[0] + "."
+
+    return html.Div([
+        html.H4(title),
+        html.P(f"Origin: {origin.group(0).strip() if origin else 'Not available.'}"),
+        html.P(
+            f"Behavior: {behavior.group(0).strip() if behavior else 'Not available.'}"
+        ),
+        html.P(f"Size: {size.group(0).strip() if size else 'Not available.'}"),
+        html.P(f"Other Relevant Facts: {fun_fact}"),
+    ])
 
 
 # Helper function to sanitize filename
@@ -59,62 +92,62 @@ def output_original_image(content):
 @callback(
     Output("output-mask-image", "children"),
     Output("output-predicted-label", "children"),  # Add output for predicted label
+    Output("animal-info", "children"),  # New output for animal information
     Input("upload-image", "contents"),
     State("upload-image", "filename"),
 )
 def output_clipped_image_and_prediction(content, filename):
     if content is not None:
-        # Ensure the temp directory exists
         if not os.path.exists("temp"):
             os.makedirs("temp")
 
-        # Sanitize the filename
         filename = sanitize_filename(filename)
-
-        # Decode the uploaded image and save it temporarily
         content_type, content_string = content.split(",")
         decoded = base64.b64decode(content_string)
         image_path = os.path.join("temp", filename)
         with open(image_path, "wb") as f:
             f.write(decoded)
 
-        # Generate the mask using the segmentation model
         image = Image.open(BytesIO(decoded))
         mask = get_mask(image, birefnet, device, transform_image)
 
-        # Save the mask temporarily
         mask_path = os.path.join("temp", f"mask_{filename}")
         mask.save(mask_path)
 
-        # Run classification with the original image and the mask, which also saves the clipped image
         predicted_label = predict_clipped_object(image_path, mask_path)
 
-        # Load the clipped image (saved as "clipped_object.png" in predict_clipped_object)
         clipped_image_path = "clipped_object.png"
         with open(clipped_image_path, "rb") as f:
             clipped_image_data = f.read()
 
-        # Encode the clipped image for display
         clipped_image_base64 = base64.b64encode(clipped_image_data).decode("utf-8")
         clipped_image_data_url = f"data:image/png;base64,{clipped_image_base64}"
 
-        # Display the clipped image and the prediction result
         clipped_image_display = dmc.AspectRatio(
             dmc.Image(src=clipped_image_data_url),
             ratio=1024 / 1024,
             mx="auto",
         )
+
+        class_num, animal_type = predicted_label
+
         prediction_display = dmc.Text(
-            f"Prediction: {predicted_label}",
+            f"Prediction: {animal_type}",
             style={"color": "#0C7FDA", "fontSize": "24px", "fontWeight": "bold"},
         )
+
+        animal_name = str(animal_type.split("-")[1]).lower()
+
+        # Fetch animal information
+        animal_info = get_animal_info(animal_name)
 
         return (
             clipped_image_display,
             prediction_display,
-        )  # Return clipped image and prediction display
+            animal_info,
+        )  # Include animal info
 
-    return None, None
+    return None, None, None
 
 
 if __name__ == "__main__":

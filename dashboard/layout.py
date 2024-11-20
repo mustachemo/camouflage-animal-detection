@@ -26,8 +26,8 @@ header = dmc.AppShellHeader(
     style={"backgroundColor": "#1e90ff",
            "padding": "10px",
            "boxShadow": "0 0 3px rgba(0, 0, 0, 0.5)",
-           "border-bottom-left-radius": "20px",
-           "border-bottom-right-radius": "20px",
+           "borderbottomleftradius": "20px",
+           "borderbottomrightradius": "20px",
            },
 )
 
@@ -128,6 +128,7 @@ layout = dmc.MantineProvider(
                                                 "boxShadow": "0 0 6px rgba(0, 0, 0, 0.5)",
                                             },
                                         ),
+                                        
                                     ],
                                 ),
                                 html.Div(

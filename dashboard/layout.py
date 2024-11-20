@@ -23,12 +23,13 @@ header = dmc.AppShellHeader(
         "sm": True,
     },
     zIndex=1000,
-    style={"backgroundColor": "#1e90ff",
-           "padding": "10px",
-           "boxShadow": "0 0 3px rgba(0, 0, 0, 0.5)",
-           "borderbottomleftradius": "20px",
-           "borderbottomrightradius": "20px",
-           },
+    style={
+        "backgroundColor": "#1e90ff",
+        "padding": "10px",
+        "boxShadow": "0 0 3px rgba(0, 0, 0, 0.5)",
+        "borderBottomLeftRadius": "20px",
+        "borderBottomRightRadius": "20px",
+    },
 )
 
 # Define the layout
@@ -115,20 +116,25 @@ layout = dmc.MantineProvider(
                                                 "boxShadow": "0 0 6px rgba(0, 0, 0, 0.5)",
                                             },
                                         ),
-                                        html.Div(
-                                            id="output-mask-image",
-                                            style={
-                                                "border": "1px solid #ccc",
-                                                "width": "200px",
-                                                "height": "200px",
-                                                "display": "flex",
-                                                "alignItems": "center",
-                                                "justifyContent": "center",
-                                                "backgroundColor": "#f9f9f9",
-                                                "boxShadow": "0 0 6px rgba(0, 0, 0, 0.5)",
-                                            },
+                                        # Add Loading Spinner to Mask Image Container
+                                        dcc.Loading(
+                                            id="loading-mask",
+                                            type="circle",  # Spinner type: circle
+                                            color="#1E90FF",  # Spinner color
+                                            children=html.Div(
+                                                id="output-mask-image",
+                                                style={
+                                                    "border": "1px solid #ccc",
+                                                    "width": "200px",
+                                                    "height": "200px",
+                                                    "display": "flex",
+                                                    "alignItems": "center",
+                                                    "justifyContent": "center",
+                                                    "backgroundColor": "#f9f9f9",
+                                                    "boxShadow": "0 0 6px rgba(0, 0, 0, 0.5)",
+                                                },
+                                            ),
                                         ),
-                                        
                                     ],
                                 ),
                                 html.Div(

@@ -94,12 +94,6 @@ layout = dmc.MantineProvider(
                                 "marginTop": "50px",
                             },
                             children=[
-                                dmc.Text(
-                                    "Image Outputs",
-                                    fw=600,
-                                    size="md",
-                                    style={"marginBottom": "10px"},
-                                ),
                                 html.Div(
                                     style={"display": "flex", "gap": "10px", "justifyContent": "center"},
                                     children=[

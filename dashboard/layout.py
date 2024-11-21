@@ -106,6 +106,8 @@ layout = dmc.MantineProvider(
                                         html.Div(
                                             id="output-original-image",
                                             style={
+                                                "margin": "2rem",
+                                                "padding": "10px",
                                                 "border": "1px solid #ccc",
                                                 "width": "200px",
                                                 "height": "200px",

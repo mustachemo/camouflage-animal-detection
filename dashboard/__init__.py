@@ -18,7 +18,8 @@ import os
 from PIL import Image
 from io import BytesIO
 import pandas as pd
-from .layout import layout
+import plotly.graph_objects as go  # Import this for Scattermapbox and figure creation
+from .layout import layout,fetch_gbif_data, create_map_figure
 import cv2
 import plotly.express as px
 import numpy as np
@@ -219,6 +220,82 @@ def output_clipped_image_and_prediction(content, filename):
         )  # Include animal info
 
     return None, None, None
+
+# Fetch data from GBIF
+def fetch_gbif_data(query):
+    url = f"https://api.gbif.org/v1/occurrence/search?q={query}&limit=1000"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        occurrences = data.get("results", [])
+        latitudes = [occ['decimalLatitude'] for occ in occurrences if 'decimalLatitude' in occ]
+        longitudes = [occ['decimalLongitude'] for occ in occurrences if 'decimalLongitude' in occ]
+        return latitudes, longitudes
+    else:
+        return [], []
+
+# Create map figure
+def create_map_figure(latitudes, longitudes):
+    fig = go.Figure(go.Scattermapbox(
+        lat=latitudes,
+        lon=longitudes,
+        mode='markers',
+        marker=go.scattermapbox.Marker(size=9),
+        text=["Occurrence"] * len(latitudes)
+    ))
+
+    fig.update_layout(
+        mapbox={
+            'accesstoken': os.getenv("MAPBOX_ACCESS_TOKEN"),
+            'style': "open-street-map",
+            'center': {"lat": 0, "lon": 0},
+            'zoom': 1,
+        },
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+    )
+    return fig
+
+@callback(
+    [Output("map", "figure"), 
+     Output("map-label", "children")],
+    [Input("output-predicted-label", "children")],
+)
+def update_map(predicted_label):
+    # Check if predicted_label is a dictionary (e.g., a Dash component like dmc.Text)
+    if isinstance(predicted_label, dict) and "props" in predicted_label:
+        # Extract the actual label from the `children` property
+        label_text = predicted_label["props"].get("children", "")
+    elif isinstance(predicted_label, str):
+        # If it's already a string, use it directly
+        label_text = predicted_label
+    else:
+        return no_update, "No prediction available to generate map."
+
+    # Ensure the label contains "Prediction:"
+    if "Prediction:" in label_text:
+        try:
+            # Extract the animal name from the label
+            full_label = str(label_text.split(":")[1]).strip()
+            animal_name = full_label.split("-")[1] if "-" in full_label else full_label
+
+            print(f"Extracted animal name: {animal_name}")  # Debugging output
+
+            # Fetch GBIF data for the specific animal name
+            latitudes, longitudes = fetch_gbif_data(animal_name)
+
+            if latitudes and longitudes:
+                label = f"Showing the last {len(latitudes)} occurrences of {animal_name}"
+            else:
+                label = f"No occurrence data available for {animal_name}"
+
+            return create_map_figure(latitudes, longitudes), label
+
+        except Exception as e:
+            print(f"Error processing predicted label: {e}")
+            return no_update, "Error processing map data."
+    
+    print("Predicted label does not contain 'Prediction:'.")
+    return no_update, "No prediction available to generate map."
 
 
 if __name__ == "__main__":

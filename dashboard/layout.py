@@ -1,6 +1,49 @@
 from dash import html, dcc
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
+import plotly.graph_objects as go
+import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+mapbox_access_token = os.getenv("MAPBOX_ACCESS_TOKEN")
+
+# Fetch data from GBIF
+def fetch_gbif_data(query):
+    url = f"https://api.gbif.org/v1/occurrence/search?q={query}&limit=1000"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        occurrences = data.get('results', [])
+        latitudes = [occ['decimalLatitude'] for occ in occurrences if 'decimalLatitude' in occ]
+        longitudes = [occ['decimalLongitude'] for occ in occurrences if 'decimalLongitude' in occ]
+        return latitudes, longitudes
+    else:
+        return [], []
+
+# Create the map figure
+def create_map_figure(latitudes, longitudes):
+    fig = go.Figure(go.Scattermapbox(
+        lat=latitudes,
+        lon=longitudes,
+        mode='markers',
+        marker=go.scattermapbox.Marker(size=9),
+        text=["Occurrence"] * len(latitudes)
+    ))
+    
+    fig.update_layout(
+        mapbox={
+            'accesstoken': mapbox_access_token,
+            'style': "open-street-map",
+            'center': {"lat": 0, "lon": 0},
+            'zoom': 1
+        },
+        margin={"r": 0, "t": 0, "l": 0, "b": 0}
+    )
+    
+    return fig
 
 # Define the AppShell Header
 header = dmc.AppShellHeader(
@@ -43,13 +86,14 @@ layout = dmc.MantineProvider(
         dmc.AppShell(
             children=[
                 header,
+                # Main Content Section
                 dmc.Flex(
                     direction="row",
                     justify="center",
-                    align="center",
+                    align="flex-start",
                     style={"padding": "20px", "gap": "20px"},
                     children=[
-                        # Drag and Drop Upload Section
+                        # File Upload Section
                         dmc.Paper(
                             style={
                                 "width": "45%",
@@ -58,6 +102,7 @@ layout = dmc.MantineProvider(
                                 "borderRadius": "10px",
                                 "textAlign": "center",
                                 "backgroundColor": "#F8FAFC",
+                                "marginTop": "150px",
                             },
                             children=[
                                 DashIconify(icon="bi:cloud-upload", width=50, color="#1E90FF"),
@@ -83,7 +128,7 @@ layout = dmc.MantineProvider(
                                 ),
                             ],
                         ),
-                        # Uploaded and Segmentation Outputs
+                        # Segmentation Outputs Section
                         dmc.Paper(
                             style={
                                 "width": "90%",
@@ -111,11 +156,10 @@ layout = dmc.MantineProvider(
                                                 "boxShadow": "0 0 6px rgba(0, 0, 0, 0.5)",
                                             },
                                         ),
-                                        # Add Loading Spinner to Mask Image Container
                                         dcc.Loading(
                                             id="loading-mask",
-                                            type="circle",  # Spinner type: circle
-                                            color="#1E90FF",  # Spinner color
+                                            type="circle",
+                                            color="#1E90FF",
                                             children=html.Div(
                                                 id="output-mask-image",
                                                 style={
@@ -153,6 +197,41 @@ layout = dmc.MantineProvider(
                                     },
                                 ),
                             ],
+                        ),
+                    ],
+                ),
+                # Map Section as Separate Container
+                dmc.Paper(
+                    style={
+                        "width": "95%",
+                        "margin": "20px auto",
+                        "padding": "20px",
+                        "border": "1px solid #bdc3c7",
+                        "borderRadius": "10px",
+                        "backgroundColor": "#FFFFFF",
+                        "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.5)",
+                    },
+                    children=[
+                        dcc.Loading(
+                            id="loading-map",  # Spinner for the map
+                            type="circle",
+                            color="#1E90FF",
+                            children=dcc.Graph(
+                                id="map",
+                                style={
+                                    "width": "100%",
+                                    "height": "500px",
+                                },
+                            ),
+                        ),
+                        html.Div(
+                            id="map-label",
+                            style={
+                                "textAlign": "center",
+                                "marginTop": "10px",
+                                "fontSize": "18px",
+                                "color": "#2c3e50",
+                            },
                         ),
                     ],
                 ),

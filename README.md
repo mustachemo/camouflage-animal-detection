@@ -46,6 +46,7 @@ This project is an AI-powered system designed to detect camouflaged animals in i
   - Plotly
   - NumPy
   - SAM2 Model (ensure it is available or download via the model repository)
+- **MapBox Default Public Access Token**: https://docs.mapbox.com/help/getting-started/access-tokens/ (note you will need to create an account, it is free)
 
 ### Installation
 
@@ -70,6 +71,9 @@ follow the steps from:
    ```bash
    https://github.com/facebookresearch/sam2
    ```
+
+4. Create a .env file in the root directory of the repo. In the .env file, add the following line:
+MAPBOX_ACCESS_TOKEN=<YOUR_MAPBOX_TOKEN_HERE>
 
 5. Start the Dash web server:
 

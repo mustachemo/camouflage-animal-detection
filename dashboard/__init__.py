@@ -278,8 +278,6 @@ def update_map(predicted_label):
             full_label = str(label_text.split(":")[1]).strip()
             animal_name = full_label.split("-")[1] if "-" in full_label else full_label
 
-            print(f"Extracted animal name: {animal_name}")  # Debugging output
-
             # Fetch GBIF data for the specific animal name
             latitudes, longitudes = fetch_gbif_data(animal_name)
 

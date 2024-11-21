@@ -40,35 +40,106 @@ birefnet, device, transform_image = initialize_seg_model()
 
 
 def get_animal_info(animal_name):
+    # Attempt to fetch information from Wikidata
+    wikidata_info = get_animal_info_from_wikidata(animal_name)
+    if wikidata_info:
+        return format_info_wikidata(animal_name, wikidata_info)
+
+    # Fallback to Wikipedia API if Wikidata information is not available
     url = f"https://en.wikipedia.org/w/api.php?action=query&format=json&titles={animal_name.replace(' ', '_')}&prop=extracts|pageprops&explaintext&redirects=1"
     response = requests.get(url)
     data = response.json()
 
-    pages = data["query"]["pages"]
-    page = next(iter(pages.values()))
+    pages = data.get("query", {}).get("pages", {})
+    page = next(iter(pages.values()), {})
 
     if "extract" in page:
-        return format_info(page["title"], page["extract"])
+        return format_info_wikipedia(page["title"], page["extract"])
     else:
         return f"No information found for {animal_name}."
 
 
-def format_info(title, extract):
-    # Extract relevant information
-    origin = re.search(r"origin.*?(\.|$)", extract, re.IGNORECASE)
-    behavior = re.search(r"behavior.*?(\.|$)", extract, re.IGNORECASE)
-    size = re.search(r"size.*?(\.|$)", extract, re.IGNORECASE)
-    fun_fact = "Did you know? " + extract.split(".")[0] + "."
+def get_animal_info_from_wikidata(animal_name):
+    query = f"""
+    SELECT ?item ?itemLabel ?nativeHabitatLabel ?size WHERE {{
+      ?item rdfs:label "{animal_name}"@en.
+      OPTIONAL {{ ?item wdt:P183 ?nativeHabitat. }}
+      OPTIONAL {{ ?item wdt:P2048 ?size. }}
+      SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
+    }}
+    """
+    url = "https://query.wikidata.org/sparql"
+    headers = {"Accept": "application/json"}
+    response = requests.get(url, params={"query": query}, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        if "results" in data.get("results", {}) and data["results"]["bindings"]:
+            return data["results"]["bindings"]
+    return None
 
-    return html.Div([
-        html.H4(title),
-        html.P(f"Origin: {origin.group(0).strip() if origin else 'Not available.'}"),
-        html.P(
-            f"Behavior: {behavior.group(0).strip() if behavior else 'Not available.'}"
+
+def format_info_wikidata(animal_name, wikidata_data):
+    # Extract information from Wikidata response
+    native_habitat = next(
+        (
+            item.get("nativeHabitatLabel", {}).get("value", "Not available.")
+            for item in wikidata_data
         ),
-        html.P(f"Size: {size.group(0).strip() if size else 'Not available.'}"),
-        html.P(f"Other Relevant Facts: {fun_fact}"),
+        "Not available.",
+    )
+    size = next(
+        (item.get("size", {}).get("value", "Not available.") for item in wikidata_data),
+        "Not available.",
+    )
+
+    # Prepare HTML output
+    return html.Div([
+        html.H4(animal_name),
+        html.P(f"Summary: Information retrieved from Wikidata."),
+        html.P(f"Native Habitat: {native_habitat}"),
+        html.P(f"Size: {size}"),
     ])
+
+
+def format_info_wikipedia(title, extract):
+    # Extract key sections from Wikipedia extract
+    origin = re.search(
+        r"(origin:.*?\.|native to.*?\.|found in.*?\.|inhabits.*?\.|distributed in.*?\.|occurs in.*?\.|endemic to.*?\.|lives in.*?\.)",
+        extract,
+        re.IGNORECASE,
+    )
+    behavior = re.search(
+        r"(behavior:.*?\.|known for.*?\.|feeds on.*?\.|hunts.*?\.|is nocturnal.*?\.|is diurnal.*?\.|exhibits.*? behavior.*?\.|mating.*?\.|social behavior.*?\.)",
+        extract,
+        re.IGNORECASE,
+    )
+    size = re.search(
+        r"(size:.*?\.|can grow up to.*?\.|weighs up to.*?\.|length.*?\.|height.*?\.|mass.*?\.|can reach.*?\.|measures.*?\.)",
+        extract,
+        re.IGNORECASE,
+    )
+
+    # Get the first part of the extract as a summary
+    summary = extract.split(".")[0].strip() + "."
+
+    # Prepare HTML output
+    return html.Div(
+        [
+            html.P(f"Summary: {summary}"),  # Summary at the beginning
+            html.P(
+                f"Origin: {origin.group(0).strip() if origin else 'Not available.'}"
+            ),
+            html.P(
+                f"Behavior: {behavior.group(0).strip() if behavior else 'Not available.'}"
+            ),
+            html.P(f"Size: {size.group(0).strip() if size else 'Not available.'}"),
+        ],
+        style={
+            "padding": "1rem",
+            "borderRadius": "5px",
+            "backgroundColor": "#f9f9f9",
+        },
+    )
 
 
 # Helper function to sanitize filename

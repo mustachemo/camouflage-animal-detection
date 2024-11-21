@@ -129,7 +129,7 @@ layout = dmc.MantineProvider(
                                         html.Div(
                                             id="animal-info",
                                             style={
-                                                "marginTop": "20px",
+                                                "margin": "2rem",
                                                 "padding": "10px",
                                                 "border": "1px solid #ccc",
                                                 "borderRadius": "5px",

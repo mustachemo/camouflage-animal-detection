@@ -86,7 +86,7 @@ layout = dmc.MantineProvider(
                         # Uploaded and Segmentation Outputs
                         dmc.Paper(
                             style={
-                                "width": "45%",
+                                "width": "90%",
                                 "padding": "20px",
                                 "borderRadius": "10px",
                                 "backgroundColor": "#FFFFFF",
@@ -106,11 +106,10 @@ layout = dmc.MantineProvider(
                                         html.Div(
                                             id="output-original-image",
                                             style={
-                                                "margin": "2rem",
                                                 "padding": "10px",
                                                 "border": "1px solid #ccc",
-                                                "width": "200px",
-                                                "height": "200px",
+                                                "width": "400px",
+                                                "height": "400px",
                                                 "display": "flex",
                                                 "alignItems": "center",
                                                 "justifyContent": "center",
@@ -127,8 +126,8 @@ layout = dmc.MantineProvider(
                                                 id="output-mask-image",
                                                 style={
                                                     "border": "1px solid #ccc",
-                                                    "width": "200px",
-                                                    "height": "200px",
+                                                    "width": "400px",
+                                                    "height": "400px",
                                                     "display": "flex",
                                                     "alignItems": "center",
                                                     "justifyContent": "center",

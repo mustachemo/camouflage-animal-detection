@@ -6,46 +6,60 @@ This project is an AI-powered system designed to detect camouflaged animals in i
 
 - **Image Detection**: Detect camouflaged animals in still images using advanced segmentation models.
 - **Species Classification**: Classify the detected animals into various species.
-- **Video Analysis**: Extract frames from YouTube videos or pass in a video and analyze them/it for camouflaged animals.
 - **Informational Output**: Provide detailed information about the detected animal's habitat and species characteristics.
-- **Interactive Visualization**: Display the detection results with bounding boxes, segmentation masks, classification labels, and any other relevant information.
-- **Performance Metrics**: Measure accuracy with precision, recall, and F1-score.
+- **Interactive Visualization**: Display the detection results with segmentation masks, classification labels, and any other relevant information.
 
 ## Technology Stack
 
 - **Backend Framework**: Dash (based on Flask)
-- **Machine Learning Model**: Segment Anything Model (SAM2) for segmentation and CNN-based models for classification.
-- **Data Processing**: NumPy, OpenCV for video frame extraction and image processing.
+- **Machine Learning Model**: BiRefNet for segmentation and CNN-based models for classification.
+- **Data Processing**: NumPy, OpenCV for video and image processing.
 - **Visualization**: Plotly, integrated with Dash for displaying results, including image overlays and detection boundaries.
 
 ## Directory Structure
 
 ```bash
-├── app.py                    # Main entry point for the Dash web app
-├── models/                   # Pretrained SAM2 models and fine-tuned classification models
-├── static/                   # Static files (e.g., images, CSS)
-│   └── sample_data/          # Sample images for testing
-├── templates/                # HTML templates for Dash layouts
-├── utils/                    # Utility functions for image processing, classification, etc.
-│   ├── video_processing.py   # Scripts for extracting frames from videos
-│   └── detection.py          # Image detection and classification logic
-├── data/                     # Datasets for training and evaluation
-├── README.md                 # Project overview and setup instructions
-└── requirements.txt          # Dependencies and libraries
+## Directory Structure
+
+```bash
+├── run.py                      # Main entry point for the Dash web app
+├── configs/                    # Configuration files
+│   └── Species_Labels_1.csv    # CSV file with species labels
+├── dashboard/                  # Dash application files
+│   ├── __init__.py             # Initialization file for the Dash app
+│   └── layout.py               # Layout definition for the Dash app
+├── data/                       # Data files and scripts
+│   ├── bootstrap_camo.sh       # Script to bootstrap camo data
+│   ├── bootstrap_cod10k.sh     # Script to bootstrap COD10K data
+│   ├── README.md               # README for data directory
+│   ├── resize_images.py        # Script to resize images
+│   ├── sample_files/           # Sample files for testing
+│   ├── test/                   # Test dataset
+│   └── train/                  # Training dataset
+├── Dockerfile                  # Docker configuration file
+├── fine_tuned_model.pth        # Fine-tuned model file
+├── logs/                       # Logs directory
+│   ├── classification_resnet_metrics_Validation.csv  # Validation metrics for classification
+│   ├── classification_resnet_metrics.json            # JSON file with classification metrics
+│   └── segmentation_model_finetune.csv               # CSV file with segmentation model finetune metrics
+├── models/                     # Model files
+│   ├── seg_model.py            # Segmentation model script
+│   └── test_seg.py             # Script to test segmentation model
+├── README.md                   # Project overview and setup instructions
+├── requirements.txt            # Dependencies and libraries
+├── sam2/                       # SAM2 model files
+│   └── demo/                   # Demo files for SAM2 model
+├── temp/                       # Temporary files
+│   ├── config.json             # Configuration file
+│   └── predicted_label.txt     # Predicted label file
+└── utils/                      # Utility functions
+    ├── classification.py       # Classification logic
+    ├── detection.py            # Image detection logic
+    ├── video_processing.py     # Scripts for extracting frames from videos
+    └── transform_data.py       # Data transformation script
 ```
 
 ## Setup Instructions
-
-### Prerequisites
-
-- **Python 3.8+**
-- **Dash**: Install via `pip`
-- **Other Dependencies**:
-  - OpenCV
-  - TensorFlow or PyTorch (depending on model framework)
-  - Plotly
-  - NumPy
-  - SAM2 Model (ensure it is available or download via the model repository)
 
 ### Installation
 
@@ -62,15 +76,14 @@ This project is an AI-powered system designed to detect camouflaged animals in i
    pip install -r requirements.txt
    ```
 
-3. Download and place the pretrained models in the `models/` directory.
 
-4. Start the Dash web server:
+3. Start the Dash web server:
 
    ```bash
    python app.py
    ```
 
-5. Open the app by navigating to `http://localhost:8050/` in your browser.
+4. Open the app by navigating to `http://localhost:8080/` in your browser.
 
 ### Docker Setup
 
@@ -83,10 +96,10 @@ This project is an AI-powered system designed to detect camouflaged animals in i
 2. Run the Docker container:
 
    ```bash
-    docker run -p 8050:8050 camouflaged-object-detection
+    docker run -p 8080:8080 -v ${PWD}/:/app --gpus all camouflaged-object-detection
     ```
 
-3. Open the app by navigating to `http://localhost:8050/` in your browser.
+3. Open the app by navigating to `http://localhost:8080/` in your browser.
 
 
 ## Bonus Features

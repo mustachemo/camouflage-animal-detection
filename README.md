@@ -72,22 +72,29 @@ This project is an AI-powered system designed to detect camouflaged animals in i
    ```
 
 2. Create a file named ".env" in the root directory of the repo. In the .env file, add the following line:
+ ``` bash
    MAPBOX_ACCESS_TOKEN=<YOUR_MAPBOX_TOKEN_HERE> (with no quotes)
-   It should look like this: MAPBOX_ACCESS_TOKEN=pk.124135435...
+```
+   
+   It should look like this: 
 
-3. Install the required libraries:
+   ``` bash
+   MAPBOX_ACCESS_TOKEN=pk.124135435...
+   ```
+
+4. Install the required libraries:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-4. Start the Dash web server:
+5. Start the Dash web server:
 
    ```bash
    python app.py
    ```
 
-5. Open the app by navigating to `http://localhost:8080/` in your browser.
+6. Open the app by navigating to `http://localhost:8080/` in your browser.
 
 ### Docker Setup
 

@@ -106,15 +106,23 @@ This project is an AI-powered system designed to detect camouflaged animals in i
    cd camouflaged-object-detection
    ```
 
-2. Build the Docker image:
+2. Create a file named ".env" in the root directory of the repo. In the .env file, add the following line:
+
+   ``` bash
+   MAPBOX_ACCESS_TOKEN=<YOUR_MAPBOX_TOKEN_HERE> (with no quotes)
+    ```
+   
+   It should look like this: 
+
+   ``` bash
+   MAPBOX_ACCESS_TOKEN=pk.124135435...
+   ```
+
+3. Build the Docker image:
 
    ```bash
    docker build -t camouflaged-object-detection .
    ```
-
-3. Create a file named ".env" in the root directory of the repo. In the .env file, add the following line:
-   MAPBOX_ACCESS_TOKEN=<YOUR_MAPBOX_TOKEN_HERE> (with no quotes)
-   It should look like this: MAPBOX_ACCESS_TOKEN=pk.124135435...
 
 4. Run the Docker container:
 

@@ -1,6 +1,5 @@
 data/train
 data/test
-data
 clipped_object.png
 temp/
 # MacOS extra file stuff

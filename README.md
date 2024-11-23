@@ -15,6 +15,7 @@ This project is an AI-powered system designed to detect camouflaged animals in i
 - **Machine Learning Model**: BiRefNet for segmentation and CNN-based models for classification.
 - **Data Processing**: NumPy, OpenCV for video and image processing.
 - **Visualization**: Plotly, integrated with Dash for displaying results, including image overlays and detection boundaries.
+- **Map API**: MapBox https://docs.mapbox.com/help/getting-started/access-tokens/ (note you will need to create an account to generate a token, it is free)
 
 ## Directory Structure
 
@@ -70,36 +71,50 @@ This project is an AI-powered system designed to detect camouflaged animals in i
    cd camouflaged-object-detection
    ```
 
-2. Install the required libraries:
+2. Create a file named ".env" in the root directory of the repo. In the .env file, add the following line:
+   MAPBOX_ACCESS_TOKEN=<YOUR_MAPBOX_TOKEN_HERE> (with no quotes)
+   It should look like this: MAPBOX_ACCESS_TOKEN=pk.124135435...
+
+3. Install the required libraries:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-
-3. Start the Dash web server:
+4. Start the Dash web server:
 
    ```bash
    python app.py
    ```
 
-4. Open the app by navigating to `http://localhost:8080/` in your browser.
+5. Open the app by navigating to `http://localhost:8080/` in your browser.
 
 ### Docker Setup
 
-1. Build the Docker image:
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/your-repo/camouflaged-object-detection.git
+   cd camouflaged-object-detection
+   ```
+
+2. Build the Docker image:
 
    ```bash
    docker build -t camouflaged-object-detection .
    ```
 
-2. Run the Docker container:
+3. Create a file named ".env" in the root directory of the repo. In the .env file, add the following line:
+   MAPBOX_ACCESS_TOKEN=<YOUR_MAPBOX_TOKEN_HERE> (with no quotes)
+   It should look like this: MAPBOX_ACCESS_TOKEN=pk.124135435...
+
+4. Run the Docker container:
 
    ```bash
     docker run -p 8080:8080 -v ${PWD}/:/app --gpus all camouflaged-object-detection
     ```
 
-3. Open the app by navigating to `http://localhost:8080/` in your browser.
+5. Open the app by navigating to `http://localhost:8080/` in your browser.
 
 
 ## Bonus Features

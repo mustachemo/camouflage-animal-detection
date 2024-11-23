@@ -257,10 +257,15 @@ def create_map_figure(latitudes, longitudes):
 
 @callback(
     [Output("map", "figure"), 
-     Output("map-label", "children")],
+     Output("map-label", "children"),
+     Output("map", "style")],  # Add style output for the map
     [Input("output-predicted-label", "children")],
 )
 def update_map(predicted_label):
+    # Default style to hide the map
+    hidden_style = {'display': 'none'}
+    visible_style = {'display': 'block', 'width': '100%', 'height': '500px'}
+
     # Check if predicted_label is a dictionary (e.g., a Dash component like dmc.Text)
     if isinstance(predicted_label, dict) and "props" in predicted_label:
         # Extract the actual label from the `children` property
@@ -269,7 +274,7 @@ def update_map(predicted_label):
         # If it's already a string, use it directly
         label_text = predicted_label
     else:
-        return no_update, "No prediction available to generate map."
+        return no_update, "No prediction available to generate map.", hidden_style
 
     # Ensure the label contains "Prediction:"
     if "Prediction:" in label_text:
@@ -283,17 +288,18 @@ def update_map(predicted_label):
 
             if latitudes and longitudes:
                 label = f"Showing the last {len(latitudes)} occurrences of {animal_name}"
+                return create_map_figure(latitudes, longitudes), label, visible_style
             else:
-                label = f"No occurrence data available for {animal_name}"
-
-            return create_map_figure(latitudes, longitudes), label
+                return go.Figure(), f"No occurrence data available for {animal_name}", hidden_style
 
         except Exception as e:
             print(f"Error processing predicted label: {e}")
-            return no_update, "Error processing map data."
+            return go.Figure(), "Error processing map data.", hidden_style
     
     print("Predicted label does not contain 'Prediction:'.")
-    return no_update, "No prediction available to generate map."
+    return go.Figure(), "No prediction available to generate map.", hidden_style
+
+
 
 
 if __name__ == "__main__":

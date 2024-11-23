@@ -72,9 +72,10 @@ This project is an AI-powered system designed to detect camouflaged animals in i
    ```
 
 2. Create a file named ".env" in the root directory of the repo. In the .env file, add the following line:
- ``` bash
+
+   ``` bash
    MAPBOX_ACCESS_TOKEN=<YOUR_MAPBOX_TOKEN_HERE> (with no quotes)
-```
+    ```
    
    It should look like this: 
 
